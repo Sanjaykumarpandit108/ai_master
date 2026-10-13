@@ -1,0 +1,12 @@
+for creating hte virtual environment
+python3 -m venv .venv
+
+for to acitivate it in the max or linux
+source .venv/bin/acitivate
+
+in the windows
+.venv\scripts\activate
+
+
+
+
