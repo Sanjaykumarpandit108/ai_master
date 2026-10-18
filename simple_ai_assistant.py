@@ -1,4 +1,3 @@
-from email.mime import message
 import json
 
 from openai import OpenAI
