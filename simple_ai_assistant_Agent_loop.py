@@ -1,10 +1,11 @@
 import json
-
+import os
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
+from Utilities.utilities import log
+from tools import Tools, run_tool_call
 
-from tools import Tools, FUNCTION_NAME_TO_FUNCTION_MAPPING
+
 
 load_dotenv() # it will load the environment variables from the .env file
 
@@ -24,7 +25,7 @@ messages.append(
 )
 
 while True:
-    user_input = input("\nYou: ")
+    user_input = input("\nSANJAY: ")
     if user_input.lower() in ["exit", "quit"]:
         print("Exiting the chat. Goodbye!")
         break   
@@ -49,18 +50,12 @@ while True:
         if not msg.tool_calls:
             break
 
+        log(f"\nStep {step + 1}: model requestted  {len(msg.tool_calls)} tool calls detected.")
+
         messages.append(msg)
 
         for tool_call in msg.tool_calls:
-            func_name = tool_call.function.name
-            func_args = {}
-            try:
-                func_args = json.loads(tool_call.function.arguments)
-                fn = FUNCTION_NAME_TO_FUNCTION_MAPPING.get(func_name)
-                result = fn(**func_args) if fn else None
-            except Exception as e:
-                result = f"Error executing tool '{func_name}': {str(e)}"
-  
+            result = run_tool_call(tool_call);
             messages.append(
                 {
                     "role": "tool",
@@ -89,4 +84,4 @@ while True:
         }
     )
 
-    print(f"\nAssistant: {msg.content}")
+    print(f"\nAssistant: {msg.content or 'No content returned from the assistant.'}")

@@ -1,6 +1,9 @@
 
+from cmath import log
 from datetime import datetime
-from urllib import request, parse
+import json
+from urllib import request
+from Utilities.utilities import log
 
 
 # Tool 1: Get the current date and time
@@ -10,11 +13,10 @@ def get_current_time():
 
 # Tool 2: Get the current weather for a city
 def get_city_weather(city):
-    city = parse.quote(city)
     url = f"https://wttr.in/{city}?format=3"
-
-    with request.urlopen(url, timeout=10) as response:
-        return response.read().decode("utf-8")
+    response = request.urlopen(url, timeout=10)
+    response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
+    return response.read().decode("utf-8").strip()
 
 def get_user_city():
     # This function can be implemented to get the user's city, for example, by using geolocation or user input.
@@ -78,3 +80,21 @@ FUNCTION_NAME_TO_FUNCTION_MAPPING = {
     "get_city_weather": get_city_weather,
     "get_user_city": get_user_city
 }
+
+def run_tool_call(tool_call):
+    func_name = tool_call.function.name
+    func_args = {}
+    try:
+        func_args = json.loads(tool_call.function.arguments)
+        log(f"tool call: {func_name} with arguments: {func_args}")
+        fn = FUNCTION_NAME_TO_FUNCTION_MAPPING.get(func_name)
+        result = fn(**func_args) if fn else None
+    except Exception as e:
+        result = f"Error executing tool '{func_name}': {str(e)}"
+
+    log(f"    result: {result}")
+    return {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "content": str(result) if result is not None else "No result returned from the tool."
+    }
