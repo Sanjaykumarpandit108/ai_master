@@ -16,6 +16,12 @@ def get_city_weather(city):
     with request.urlopen(url, timeout=10) as response:
         return response.read().decode("utf-8")
 
+def get_user_city():
+    # This function can be implemented to get the user's city, for example, by using geolocation or user input.
+    # For now, we'll return a placeholder value.
+    # take a user value from input and return it
+    city = input("Please enter your city: ")
+    return city
 
 # Tool definitions for the LLM
 Tools = [
@@ -50,6 +56,18 @@ Tools = [
                 "required": ["city"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_user_city",
+            "description": "Get the user's city.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
     }
 ]
 
@@ -57,5 +75,6 @@ Tools = [
 # Map function names to Python functions
 FUNCTION_NAME_TO_FUNCTION_MAPPING = {
     "get_current_time": get_current_time,
-    "get_city_weather": get_city_weather
+    "get_city_weather": get_city_weather,
+    "get_user_city": get_user_city
 }

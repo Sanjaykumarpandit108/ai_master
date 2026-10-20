@@ -15,6 +15,7 @@ client = OpenAI(
 
 messages = []
 
+# this is system
 messages.append(
     {
         "role": "system",
@@ -35,6 +36,7 @@ while True:
         messages=messages,
         tools=Tools
     )
+    #  print(f"\nRaw response: {response}")
 
     msg = response.choices[0].message
     if msg.tool_calls:
